@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; color: #eee; font-family: monospace; padding: 2rem; min-height: 100vh; }
+    h1 { font-size: 1.4rem; margin-bottom: 1.5rem; color: #fff; }
+    h2 { font-size: 1rem; margin-bottom: 0.75rem; color: #aaa; }
+
+    .layout { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .left { flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 1rem; }
+    .right { display: flex; flex-direction: column; gap: 1rem; }
+
+    label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 0.3rem; }
+
+    select, textarea {
+      width: 100%;
+      background: #1e1e1e;
+      color: #eee;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 0.5rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+    select { padding: 0.4rem; cursor: pointer; }
+    textarea { resize: vertical; min-height: 260px; line-height: 1.5; }
+
+    .row { display: flex; gap: 0.5rem; }
+    button {
+      background: #2a6;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1.2rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    button:hover { background: #3b7; }
+    button.secondary { background: #444; }
+    button.secondary:hover { background: #555; }
+
+    #url-box {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #8cf;
+      word-break: break-all;
+      min-height: 2.5rem;
+    }
+
+    #qr-container {
+      background: #fff;
+      border-radius: 4px;
+      padding: 12px;
+      display: inline-block;
+      min-width: 172px;
+      min-height: 172px;
+    }
+    #qr-container canvas, #qr-container img { display: block; }
+
+    #size-note { font-size: 0.75rem; color: #888; }
+    #size-note.warn { color: #f80; }
+    #size-note.error { color: #f55; }
+
+    .copy-row { display: flex; gap: 0.5rem; align-items: center; }
+    #copy-feedback { font-size: 0.75rem; color: #8f8; opacity: 0; transition: opacity 0.3s; }
+
+    details { border: 1px solid #333; border-radius: 4px; }
+    summary { padding: 0.5rem 0.75rem; cursor: pointer; font-size: 0.85rem; color: #aaa; }
+    summary:hover { color: #eee; }
+    .examples-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; padding: 0.75rem; }
+    .example-btn {
+      background: #1e1e1e;
+      color: #ccc;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .example-btn:hover { background: #2a2a2a; border-color: #555; color: #eee; }
+  </style>
+</head>
+<body>
+  <h1>Puzzle Generator</h1>
+
+  <div class="layout">
+    <div class="left">
+      <div>
+        <details>
+          <summary>Examples</summary>
+          <div class="examples-grid" id="examples-grid"></div>
+        </details>
+      </div>
+      <div>
+        <label for="code">JavaScript puzzle code — <code>root</code> is the full-page container element</label>
+        <textarea id="code" spellcheck="false" placeholder="// Write your puzzle here&#10;root.style.background = '#000';&#10;root.textContent = 'Hello!';"></textarea>
+      </div>
+      <div>
+        <label for="base-url">Base URL (change to your GitHub Pages URL)</label>
+        <select id="base-url-preset">
+          <option value="local">Local — file://</option>
+          <option value="custom">Custom URL</option>
+        </select>
+      </div>
+      <div id="custom-url-row" style="display:none">
+        <label for="custom-url">Custom base URL</label>
+        <input id="custom-url" type="text" style="width:100%;background:#1e1e1e;color:#eee;border:1px solid #333;border-radius:4px;padding:0.5rem;font-family:monospace;font-size:0.85rem;" placeholder="https://your-username.github.io/puzzle-map/">
+      </div>
+      <div class="row">
+        <button onclick="generate()">Generate QR</button>
+        <button class="secondary" onclick="preview()">Preview</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <div>
+        <h2>Puzzle URL</h2>
+        <div class="copy-row">
+          <div id="url-box">—</div>
+          <button class="secondary" onclick="copyUrl()" style="white-space:nowrap">Copy</button>
+          <span id="copy-feedback">Copied!</span>
+        </div>
+        <div id="size-note" style="margin-top:0.4rem"> </div>
+      </div>
+      <div>
+        <h2>QR Code</h2>
+        <div id="qr-container"><div style="width:148px;height:148px;background:#eee;border-radius:2px;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Examples ──────────────────────────────────────────────────────────────
+    const EXAMPLES = [
+      {
+        name: 'Hello World',
+        code: `root.style.cssText = 'display:flex;align-items:center;justify-content:center;background:#000';
+const h = document.createElement('h1');
+h.textContent = 'Hello, World!';
+h.style.cssText = 'color:#fff;font-family:monospace;font-size:3rem';
+root.appendChild(h);`
+      },
+      {
+        name: 'Scrolling text',
+        code: `root.style.cssText = 'overflow:hidden;background:#000;display:flex;align-items:center';
+const p = document.createElement('div');
+p.textContent = '🎉 Congratulations! You found the secret message! 🎉';
+p.style.cssText = 'color:#0f0;font-family:monospace;font-size:2rem;white-space:nowrap;animation:scroll 8s linear infinite';
+root.appendChild(p);
+const style = document.createElement('style');
+style.textContent = '@keyframes scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}';
+document.head.appendChild(style);`
+      },
+      {
+        name: 'Blinking lights',
+        code: `root.style.cssText = 'background:#000;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;padding:32px';
+const colors = ['#f00','#0f0','#00f','#ff0','#f0f','#0ff','#fff'];
+for(let i=0;i<42;i++){
+  const d=document.createElement('div');
+  const c=colors[i%colors.length];
+  d.style.cssText=\`width:40px;height:40px;border-radius:50%;background:\${c};animation:blink \${0.5+Math.random()*1.5}s \${Math.random()}s ease-in-out infinite alternate;box-shadow:0 0 16px \${c}\`;
+  root.appendChild(d);
+}
+const s=document.createElement('style');
+s.textContent='@keyframes blink{from{opacity:0.1}to{opacity:1}}';
+document.head.appendChild(s);`
+      },
+      {
+        name: 'Countdown',
+        code: `root.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111';
+const label=document.createElement('div');
+label.textContent='Time remaining';
+label.style.cssText='color:#888;font-family:monospace;font-size:1rem;margin-bottom:1rem';
+root.appendChild(label);
+const el=document.createElement('div');
+el.style.cssText='color:#0f0;font-family:monospace;font-size:6rem;font-weight:bold';
+root.appendChild(el);
+let n=10;
+const tick=()=>{el.textContent=n--;if(n<-1){el.textContent='🎉';clearInterval(t);}};
+tick();const t=setInterval(tick,1000);`
+      },
+      {
+        name: 'Click counter',
+        code: `root.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111;cursor:pointer;user-select:none';
+let n=0;
+const el=document.createElement('div');
+el.style.cssText='color:#fff;font-family:monospace;font-size:5rem;font-weight:bold';
+el.textContent='0';
+root.appendChild(el);
+const hint=document.createElement('div');
+hint.textContent='tap to count';
+hint.style.cssText='color:#555;font-family:monospace;font-size:1rem;margin-top:1rem';
+root.appendChild(hint);
+root.addEventListener('click',()=>{el.textContent=++n;});`
+      },
+      {
+        name: 'Matrix rain',
+        code: `root.style.cssText='background:#000;overflow:hidden';
+const canvas=document.createElement('canvas');
+canvas.style.cssText='display:block;width:100%;height:100%';
+root.appendChild(canvas);
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=root.clientWidth;canvas.height=root.clientHeight;}
+resize();
+const W=()=>canvas.width,H=()=>canvas.height;
+const cols=()=>Math.floor(W()/14);
+let drops=[];
+const reset=()=>{drops=Array.from({length:cols()},()=>Math.random()*-50|0);};
+reset();window.addEventListener('resize',()=>{resize();reset();});
+const chars='アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF';
+setInterval(()=>{
+  ctx.fillStyle='rgba(0,0,0,0.05)';ctx.fillRect(0,0,W(),H());
+  ctx.fillStyle='#0f0';ctx.font='14px monospace';
+  drops.forEach((y,i)=>{
+    ctx.fillText(chars[Math.random()*chars.length|0],i*14,y*14);
+    if(y*14>H()&&Math.random()>0.975)drops[i]=0;else drops[i]++;
+  });
+},33);`
+      },
+    ];
+
+    const grid = document.getElementById('examples-grid');
+    EXAMPLES.forEach(ex => {
+      const btn = document.createElement('button');
+      btn.className = 'example-btn';
+      btn.textContent = ex.name;
+      btn.onclick = () => { document.getElementById('code').value = ex.code; };
+      grid.appendChild(btn);
+    });
+
+    // ── URL helpers ───────────────────────────────────────────────────────────
+    document.getElementById('base-url-preset').addEventListener('change', function () {
+      document.getElementById('custom-url-row').style.display =
+        this.value === 'custom' ? '' : 'none';
+    });
+
+    function getBaseUrl() {
+      const preset = document.getElementById('base-url-preset').value;
+      if (preset === 'local') {
+        // Construct file:// URL relative to this generate.html
+        const here = window.location.href.replace(/generate\.html.*$/, '');
+        return here + 'index.html';
+      }
+      let url = document.getElementById('custom-url').value.trim();
+      if (!url) return '';
+      if (!url.endsWith('/') && !url.endsWith('.html')) url += '/';
+      if (!url.endsWith('index.html')) url = url.replace(/\/?$/, '/') + 'index.html';
+      return url;
+    }
+
+    let lastUrl = '';
+
+    function generate() {
+      const code = document.getElementById('code').value.trim();
+      if (!code) return;
+      const encoded = btoa(unescape(encodeURIComponent(code)));
+      const base = getBaseUrl();
+      const url = base + '?p=' + encoded;
+      lastUrl = url;
+
+      document.getElementById('url-box').textContent = url;
+
+      const note = document.getElementById('size-note');
+      const len = url.length;
+      if (len < 1000) { note.className = 'size-note'; note.textContent = `URL length: ${len} chars — excellent`; }
+      else if (len < 2000) { note.className = 'size-note warn'; note.textContent = `URL length: ${len} chars — QR code will be dense`; }
+      else { note.className = 'size-note error'; note.textContent = `URL length: ${len} chars — may exceed QR code capacity, try minifying`; }
+
+      const container = document.getElementById('qr-container');
+      container.innerHTML = '';
+      new QRCode(container, {
+        text: url,
+        width: 256,
+        height: 256,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function preview() {
+      const code = document.getElementById('code').value.trim();
+      if (!code) return;
+      const encoded = btoa(unescape(encodeURIComponent(code)));
+      const base = window.location.href.replace(/generate\.html.*$/, '') + 'index.html';
+      window.open(base + '?p=' + encoded, '_blank');
+    }
+
+    function copyUrl() {
+      if (!lastUrl) return;
+      navigator.clipboard.writeText(lastUrl).then(() => {
+        const fb = document.getElementById('copy-feedback');
+        fb.style.opacity = '1';
+        setTimeout(() => { fb.style.opacity = '0'; }, 1500);
+      });
+    }
+  </script>
+</body>
+</html>

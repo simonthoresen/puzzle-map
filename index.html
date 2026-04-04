@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; color: #fff; font-family: monospace; width: 100vw; height: 100vh; overflow: hidden; }
+    #puzzle { width: 100%; height: 100%; }
+    #error { padding: 2rem; color: #f55; font-size: 1rem; white-space: pre-wrap; }
+    #placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: #444; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div id="puzzle"></div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('p');
+    if (encoded) {
+      try {
+        const code = atob(encoded);
+        // Make `root` available as a convenience handle to #puzzle
+        window.root = document.getElementById('puzzle');
+        eval(code);
+      } catch (e) {
+        const el = document.createElement('div');
+        el.id = 'error';
+        el.textContent = 'Puzzle error:\n' + e.message;
+        document.body.replaceChild(el, document.getElementById('puzzle'));
+      }
+    } else {
+      document.getElementById('puzzle').innerHTML =
+        '<div id="placeholder">No puzzle loaded. Scan a QR code or add <code>?p=&lt;base64&gt;</code> to the URL.</div>';
+    }
+  </script>
+</body>
+</html>
