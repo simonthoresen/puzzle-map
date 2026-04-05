@@ -9,29 +9,64 @@
     body { background: #000; color: #fff; font-family: monospace; width: 100vw; height: 100vh; overflow: hidden; }
     #puzzle { width: 100%; height: 100%; }
     #error { padding: 2rem; color: #f55; font-size: 1rem; white-space: pre-wrap; }
-    #placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: #444; font-size: 0.9rem; }
+    #placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: #444; font-size: 0.9rem; text-align: center; padding: 1rem; }
   </style>
 </head>
 <body>
   <div id="puzzle"></div>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const encoded = params.get('p');
-    if (encoded) {
+    window.root = document.getElementById('puzzle');
+
+    function run(code) {
+      try { eval(code); } catch (e) {
+        root.outerHTML = '<div id="error">Puzzle error:\n' + e.message + '</div>';
+      }
+    }
+
+    function b64decode(s) {
+      // base64url → standard base64
+      var b = s.replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      return decodeURIComponent(escape(atob(b)));
+    }
+
+    var p = params.get('p');
+    var t = params.get('t');
+
+    if (p) {
+      // Mode 1: Inline JS (base64)
+      run(atob(p));
+    } else if (t) {
+      // Mode 2: Template reference (base64url-encoded JSON)
+      // JSON: {"n":"template","l":"LOCATION","a":"val",...}
+      // "n" = template name, "l" = location, rest = __KEY__ placeholders
       try {
-        const code = atob(encoded);
-        // Make `root` available as a convenience handle to #puzzle
-        window.root = document.getElementById('puzzle');
-        eval(code);
+        var cfg = JSON.parse(b64decode(t));
+        var name = cfg.n.replace(/[^a-z0-9\-]/gi, '');
+        fetch('js/' + name + '.js')
+          .then(function(r) {
+            if (!r.ok) throw new Error('Template not found: ' + name);
+            return r.text();
+          })
+          .then(function(js) {
+            for (var k in cfg) {
+              if (k === 'n') continue;
+              js = js.replaceAll('__' + k.toUpperCase() + '__', String(cfg[k]));
+            }
+            run(js);
+          })
+          .catch(function(e) {
+            root.outerHTML = '<div id="error">Load error:\n' + e.message + '</div>';
+          });
       } catch (e) {
-        const el = document.createElement('div');
-        el.id = 'error';
-        el.textContent = 'Puzzle error:\n' + e.message;
-        document.body.replaceChild(el, document.getElementById('puzzle'));
+        root.outerHTML = '<div id="error">Decode error:\n' + e.message + '</div>';
       }
     } else {
-      document.getElementById('puzzle').innerHTML =
-        '<div id="placeholder">No puzzle loaded. Scan a QR code or add <code>?p=&lt;base64&gt;</code> to the URL.</div>';
+      root.innerHTML =
+        '<div id="placeholder">No puzzle loaded.<br><br>' +
+        '<code>?t=&lt;base64url JSON&gt;</code> — template mode<br>' +
+        '<code>?p=&lt;base64 JS&gt;</code> — inline mode</div>';
     }
   </script>
 </body>

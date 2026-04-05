@@ -4,12 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`puzzle-map` is a QR-code puzzle platform with a puzzle-trail generator. Each puzzle is a JavaScript snippet base64-encoded into a URL (`index.html?p=<base64>`). Scanning the QR code opens the viewer, which decodes and `eval`s the snippet.
+`puzzle-map` is a QR-code puzzle platform with a puzzle-trail generator. Puzzles are JavaScript templates served from `js/` and loaded via URL params.
 
-## Web platform
+## Web platform (deployed to GitHub Pages)
 
-- `index.html` — viewer (runs puzzle code; exposes `root` div)
-- `generate.html` — generator (editor + QR output via qrcodejs CDN)
+- `index.html` — puzzle viewer, two modes:
+  - Template mode: `?t=<template>&l=<location>&<params>` (preferred, short URLs)
+  - Inline mode: `?p=<base64>` (bespoke puzzles)
+- `generate.html` — puzzle editor + QR code generator
+- `js/` — 30 published JS templates (20 minigames + 10 puzzle types)
 - `.github/workflows/pages.yml` — deploys to GitHub Pages on push to main
 
 ## Puzzle generation
@@ -20,27 +23,30 @@ The `generate-puzzles` skill creates puzzle-trail treasure hunts for multiple pl
 
 ```
 puzzle-map/
-├── hunts/                        # Gitignored — personal/private content
-│   ├── locations.md              # Available hiding spots, grouped by zone
-│   ├── players.md                # Game setup + player profiles
-│   ├── puzzles-{name}.md         # Generated: per-player puzzle files
-│   ├── puzzles-{name}-simple.md  # Generated: accessible variants
-│   └── trails.md                 # Generated: combined placement trail
-└── generate-puzzles/             # Skill (agentskills.io spec)
-    ├── SKILL.md                  # Skill definition and generation instructions
-    ├── assets/
-    │   ├── puzzle-template.md
-    │   └── trail-template.md
-    └── references/
-        └── puzzle-design.md      # Non-negotiable puzzle design rules
+├── index.html                        # Puzzle viewer
+├── generate.html                     # Puzzle editor
+├── js/                               # Published JS templates (minigames + puzzles)
+├── hunts/                            # Gitignored — personal/private content
+│   └── {hunt-name}/
+│       ├── locations.md
+│       ├── players.md
+│       ├── puzzles-{player}.md
+│       └── trails.md
+└── .claude/skills/generate-puzzles/  # Skill (agentskills.io spec)
+    ├── SKILL.md
+    ├── assets/                       # Output templates (markdown format)
+    ├── references/
+    │   └── puzzle-design.md
+    └── scripts/
+        └── generate-qr.py
 ```
 
 ### How to generate a hunt
 
-Use the `generate-puzzles` skill. It reads `hunts/locations.md` and `hunts/players.md`, then outputs puzzle files and a trail file into `hunts/`. See `generate-puzzles/SKILL.md` for full instructions.
+Use the `generate-puzzles` skill. It reads `hunts/{hunt-name}/locations.md` and `hunts/{hunt-name}/players.md`, picks from the `js/` templates, and outputs puzzle files with short template-reference URLs.
 
 ### Key rules
 
 - The decoded answer of every puzzle must BE the location (no wrapper text).
 - No method hints, no zone giveaways, no fill-in-the-blank giveaways.
-- See `generate-puzzles/references/puzzle-design.md` for the complete list.
+- See `.claude/skills/generate-puzzles/references/puzzle-design.md` for the complete list.
