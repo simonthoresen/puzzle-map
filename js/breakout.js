@@ -4,7 +4,7 @@ var x = c.getContext('2d');
 var Z = 'position:fixed;inset:0;display:grid;place-items:center;background:#000;font:bold 5vw monospace;color:';
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -23,10 +23,12 @@ for (var r = 0; r < 4; r++)
     bk.push({ x: i * (w + 4) + 2, y: r * 24 + 40, w, h: 20, a: 1 });
   }
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
-};
+}, { passive: false });
+
+c.addEventListener('mousemove', e => { px = e.clientX; });
 
 !function f() {
   requestAnimationFrame(f);

@@ -3,7 +3,7 @@ const c = document.createElement('canvas');
 const x = c.getContext('2d');
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -17,9 +17,13 @@ let obs = [];
 let t0 = Date.now();
 let go = 1;
 
-root.ontouchstart = root.onclick = () => {
+document.addEventListener('touchstart', () => {
   if (go && py >= G - 1) vy = -H * .022;
-};
+});
+
+c.addEventListener('mousedown', () => {
+  if (go && py >= G - 1) vy = -H * .022;
+});
 
 function f() {
   if (!go) return;

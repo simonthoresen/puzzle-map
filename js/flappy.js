@@ -3,7 +3,7 @@ const c = document.createElement('canvas');
 const x = c.getContext('2d');
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -17,9 +17,13 @@ let sc = 0;
 let go = 1;
 let fr = 0;
 
-root.ontouchstart = root.onclick = () => {
+document.addEventListener('touchstart', () => {
   if (go) bv = -6;
-};
+});
+
+c.addEventListener('mousedown', () => {
+  if (go) bv = -6;
+});
 
 function die() {
   go = 0;

@@ -27,13 +27,13 @@ function rf() {
 
 rf();
 
-root.ontouchstart = e => {
+document.addEventListener('touchstart', e => {
   var t = e.touches[0];
   tx = t.clientX;
   ty = t.clientY;
-};
+});
 
-root.ontouchend = e => {
+document.addEventListener('touchend', e => {
   var t = e.changedTouches[0];
   var a = t.clientX - tx;
   var b = t.clientY - ty;
@@ -41,7 +41,7 @@ root.ontouchend = e => {
   Math.abs(a) > Math.abs(b)
     ? dy && (dx = a > 0 ? 1 : -1, dy = 0)
     : dx && (dy = b > 0 ? 1 : -1, dx = 0);
-};
+});
 
 setInterval(() => {
   if (!go) return;

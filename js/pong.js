@@ -3,7 +3,7 @@ const c = document.createElement('canvas');
 const x = c.getContext('2d');
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -21,12 +21,12 @@ let as = 0;
 let ph = H * .18;
 let go = 1;
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   py = e.touches[0].clientY;
-};
+}, { passive: false });
 
-root.onmousemove = e => py = e.clientY;
+c.addEventListener('mousemove', e => { py = e.clientY; });
 
 function f() {
   if (!go) return;

@@ -4,7 +4,7 @@ var x = c.getContext('2d');
 var Z = 'position:fixed;inset:0;display:grid;place-items:center;background:#000;font:bold 5vw monospace;color:';
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -18,12 +18,19 @@ var go = 1;
 var hp = 2;
 var fr = 0;
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
-};
+}, { passive: false });
 
-root.onclick = () => go && bl.push({ x: px, y: H - 40 });
+document.addEventListener('touchstart', e => {
+  if (!go) return;
+  px = e.touches[0].clientX;
+  bl.push({ x: px, y: H - 40 });
+});
+
+c.addEventListener('mousemove', e => { px = e.clientX; });
+c.addEventListener('mousedown', () => { go && bl.push({ x: px, y: H - 40 }); });
 
 !function f() {
   if (!go) return;

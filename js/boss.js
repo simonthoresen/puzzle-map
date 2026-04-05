@@ -1,33 +1,51 @@
 const L = '__L__';
-const c = document.createElement('canvas');
-const x = c.getContext('2d');
+const cv = document.createElement('canvas');
+const x = cv.getContext('2d');
 const Z = 'position:fixed;inset:0;display:grid;place-items:center;background:#000;font:bold 5vw monospace;color:';
 const E = c => { root.style.cssText = Z + c };
 
-root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
-c.width = innerWidth;
-c.height = innerHeight;
+root.appendChild(cv);
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
+cv.width = innerWidth;
+cv.height = innerHeight;
 
-const W = c.width;
-const H = c.height;
+const W = cv.width;
+const H = cv.height;
 
 let px = W / 2;
-let py = H * .8;
+let py = H * 0.8;
 let bx = W / 2;
-let bh = 30;
-let ph = 2;
-let P = [];
-let A = [];
+let bossHp = 30;
+let playerHp = 2;
+let shots = [];
+let attacks = [];
 let go = 1;
 let fr = 0;
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
-};
+}, { passive: false });
 
-root.onclick = () => go && P.push({ x: px, y: py - 20 });
+document.addEventListener('touchstart', e => {
+  if (!go) return;
+  px = e.touches[0].clientX;
+  shots.push({ x: px, y: py - 20 });
+});
+
+cv.addEventListener('mousedown', e => {
+  if (!go) return;
+  px = e.clientX;
+  shots.push({ x: px, y: py - 20 });
+});
+
+cv.addEventListener('mousemove', e => {
+  px = e.clientX;
+});
+
+const bossW = 60;
+const bossH = 40;
+const bossY = 40;
 
 !function f() {
   if (!go) return;
@@ -36,57 +54,74 @@ root.onclick = () => go && P.push({ x: px, y: py - 20 });
   x.fillStyle = '#111';
   x.fillRect(0, 0, W, H);
 
-  bx = W / 2 + Math.sin(++fr * .02) * W * .35;
+  bx = W / 2 + Math.sin(++fr * 0.02) * W * 0.35;
 
-  fr % 25 || A.push({ x: bx, y: 80, v: 4 });
+  if (fr % 25 === 0) {
+    attacks.push({ x: bx, y: bossY + bossH, v: 4 });
+  }
 
   x.fillStyle = '#f44';
-  x.fillRect(bx - 30, 40, 60, 40);
+  x.fillRect(bx - bossW / 2, bossY, bossW, bossH);
+
+  x.fillStyle = '#f00';
+  x.fillRect(bx - bossW / 2, bossY - 10, bossW * (bossHp / 30), 6);
 
   x.fillStyle = '#0af';
   x.beginPath();
-  x.moveTo(px, py - 12);
-  x.lineTo(px - 10, py + 10);
-  x.lineTo(px + 10, py + 10);
+  x.moveTo(px, py - 14);
+  x.lineTo(px - 12, py + 12);
+  x.lineTo(px + 12, py + 12);
   x.fill();
 
-  for (let i = P.length; i--;) {
-    let p = P[i];
-    p.y -= 6;
+  x.fillStyle = '#0f0';
+  for (let i = 0; i < playerHp; i++) {
+    x.fillRect(10 + i * 20, H - 20, 14, 10);
+  }
+
+  for (let i = shots.length; i--;) {
+    let p = shots[i];
+    p.y -= 8;
     x.fillStyle = '#ff0';
-    x.fillRect(p.x - 1, p.y, 3, 8);
+    x.fillRect(p.x - 2, p.y, 4, 10);
 
     if (p.y < 0) {
-      P.splice(i, 1);
+      shots.splice(i, 1);
       continue;
     }
 
-    p.x > bx - 30 && p.x < bx + 30 && p.y < 80 && p.y > 30 && (P.splice(i, 1), bh--);
+    if (p.x > bx - bossW / 2 && p.x < bx + bossW / 2 &&
+        p.y < bossY + bossH && p.y > bossY - 10) {
+      shots.splice(i, 1);
+      bossHp--;
+    }
   }
 
-  for (let i = A.length; i--;) {
-    let a = A[i];
+  for (let i = attacks.length; i--;) {
+    let a = attacks[i];
     a.y += a.v;
     x.fillStyle = '#f84';
     x.beginPath();
-    x.arc(a.x, a.y, 5, 0, 7);
+    x.arc(a.x, a.y, 7, 0, 7);
     x.fill();
 
-    a.y > H
-      ? A.splice(i, 1)
-      : Math.hypot(a.x - px, a.y - py) < 18 && (A.splice(i, 1), ph--);
+    if (a.y > H + 10) {
+      attacks.splice(i, 1);
+    } else if (Math.abs(a.x - px) < 24 && Math.abs(a.y - py) < 24) {
+      attacks.splice(i, 1);
+      playerHp--;
+    }
   }
 
-  if (ph <= 0) {
+  if (playerHp <= 0) {
     go = 0;
     E('#f44');
-    root.innerHTML = 'GAME OVER<br><small style=color:#888>tap</small>';
+    root.innerHTML = 'GAME OVER<br><small style=color:#888>tap to retry</small>';
     root.onclick = () => location.reload();
   }
 
-  if (bh <= 0) {
+  if (bossHp <= 0) {
     go = 0;
     E('#0f0;padding:1em');
     root.textContent = L;
   }
-}()
+}();

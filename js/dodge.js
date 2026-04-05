@@ -3,7 +3,7 @@ const c = document.createElement('canvas');
 const x = c.getContext('2d');
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -15,12 +15,12 @@ let obs = [];
 let t0 = Date.now();
 let go = 1;
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
-};
+}, { passive: false });
 
-root.onmousemove = e => px = e.clientX;
+c.addEventListener('mousemove', e => { px = e.clientX; });
 
 function f() {
   if (!go) return;

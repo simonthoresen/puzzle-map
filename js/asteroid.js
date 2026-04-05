@@ -16,16 +16,16 @@ let ast = [];
 let t0 = Date.now();
 let go = 1;
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
   py = e.touches[0].clientY;
-};
+}, { passive: false });
 
-root.onmousemove = e => {
+c.addEventListener('mousemove', e => {
   px = e.clientX;
   py = e.clientY;
-};
+});
 
 function f() {
   if (!go) return;

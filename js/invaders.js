@@ -5,7 +5,7 @@ const Z = 'position:fixed;inset:0;display:grid;place-items:center;background:#00
 const E = c => { root.style.cssText = Z + c };
 
 root.appendChild(c);
-root.style.cssText = 'margin:0;overflow:hidden';
+root.style.cssText = 'margin:0;overflow:hidden;touch-action:none';
 c.width = innerWidth;
 c.height = innerHeight;
 
@@ -23,12 +23,19 @@ for (let r = 0; r < 4; r++)
   for (let j = 0; j < 6; j++)
     en.push({ x: j * 50 + 40, y: r * 36 + 40, a: 1 });
 
-root.ontouchmove = e => {
+document.addEventListener('touchmove', e => {
   e.preventDefault();
   px = e.touches[0].clientX;
-};
+}, { passive: false });
 
-root.onclick = () => go && bl.push({ x: px, y: H - 50 });
+document.addEventListener('touchstart', e => {
+  if (!go) return;
+  px = e.touches[0].clientX;
+  bl.push({ x: px, y: H - 50 });
+});
+
+c.addEventListener('mousemove', e => { px = e.clientX; });
+c.addEventListener('mousedown', () => { go && bl.push({ x: px, y: H - 50 }); });
 
 !function f() {
   if (!go) return;
