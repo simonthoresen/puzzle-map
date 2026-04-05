@@ -25,6 +25,13 @@ c.addEventListener('mousedown', () => {
   if (go && py >= G - 1) vy = -H * .022;
 });
 
+document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'ArrowUp') && !e.repeat) {
+    e.preventDefault();
+    if (go && py >= G - 1) vy = -H * .022;
+  }
+});
+
 function f() {
   if (!go) return;
   requestAnimationFrame(f);

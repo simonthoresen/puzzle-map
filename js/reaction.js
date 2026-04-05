@@ -17,6 +17,13 @@ function go() {
 
 go();
 
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' && !e.repeat) {
+    e.preventDefault();
+    root.click();
+  }
+});
+
 root.onclick = () => {
   if (!ok) return;
 

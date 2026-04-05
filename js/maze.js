@@ -26,6 +26,29 @@ root.ontouchstart = e => {
   ty = t.clientY;
 };
 
+document.addEventListener('keydown', e => {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+  var nx = px;
+  var ny = py;
+  if (e.key === 'ArrowLeft' || e.key === 'a') nx--;
+  else if (e.key === 'ArrowRight' || e.key === 'd') nx++;
+  else if (e.key === 'ArrowUp' || e.key === 'w') ny--;
+  else if (e.key === 'ArrowDown' || e.key === 's') ny++;
+  else return;
+
+  nx >= 0 & nx < S & ny >= 0 & ny < S && M[ny * S + nx] < '1' && (
+    px = nx,
+    py = ny,
+    dr(),
+    px == 7 & py == 7 && (
+      root.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;background:#000;font:bold 5vw monospace;color:#0f0;padding:1em',
+      root.textContent = L
+    )
+  );
+});
+
 root.ontouchend = e => {
   var t = e.changedTouches[0];
   var dx = t.clientX - tx;

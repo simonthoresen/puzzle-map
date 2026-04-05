@@ -31,4 +31,12 @@ opts.forEach((o, i) => {
   };
 
   od.appendChild(d);
+});
+
+document.addEventListener('keydown', e => {
+  const n = parseInt(e.key);
+  if (n >= 1 && n <= 4 && !e.repeat) {
+    const items = od.children;
+    if (items[n - 1]) items[n - 1].click();
+  }
 })

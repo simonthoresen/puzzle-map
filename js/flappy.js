@@ -25,6 +25,13 @@ c.addEventListener('mousedown', () => {
   if (go) bv = -6;
 });
 
+document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'ArrowUp') && !e.repeat) {
+    e.preventDefault();
+    if (go) bv = -6;
+  }
+});
+
 function die() {
   go = 0;
   root.innerHTML = '<div onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f44;font:bold 5vw monospace;text-align:center">GAME OVER (' + sc + '/12)<br><span style="font-size:3vw;color:#888">tap to retry</span></div>';

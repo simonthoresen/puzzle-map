@@ -33,6 +33,16 @@ document.addEventListener('touchstart', e => {
   ty = t.clientY;
 });
 
+document.addEventListener('keydown', e => {
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+  if ((e.key === 'ArrowLeft' || e.key === 'a') && dy !== 0) { dx = -1; dy = 0; }
+  if ((e.key === 'ArrowRight' || e.key === 'd') && dy !== 0) { dx = 1; dy = 0; }
+  if ((e.key === 'ArrowUp' || e.key === 'w') && dx !== 0) { dy = -1; dx = 0; }
+  if ((e.key === 'ArrowDown' || e.key === 's') && dx !== 0) { dy = 1; dx = 0; }
+});
+
 document.addEventListener('touchend', e => {
   var t = e.changedTouches[0];
   var a = t.clientX - tx;

@@ -24,9 +24,22 @@ document.addEventListener('touchmove', e => {
 
 c.addEventListener('mousemove', e => { px = e.clientX; });
 
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
 function f() {
   if (!go) return;
   requestAnimationFrame(f);
+
+  if (keys['ArrowLeft'] || keys['a']) px -= 10;
+  if (keys['ArrowRight'] || keys['d']) px += 10;
+  px = Math.max(0, Math.min(W, px));
 
   x.fillStyle = '#111';
   x.fillRect(0, 0, W, H);

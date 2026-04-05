@@ -46,4 +46,15 @@ function mk() {
   };
 }
 
+document.addEventListener('keydown', e => {
+  if (e.key === 'y' || e.key === 'Y') {
+    const el = document.getElementById('y');
+    if (el) el.click();
+  }
+  if (e.key === 'n' || e.key === 'N') {
+    const el = document.getElementById('n');
+    if (el) el.click();
+  }
+});
+
 mk()

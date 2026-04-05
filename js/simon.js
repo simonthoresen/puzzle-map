@@ -48,6 +48,13 @@ cols.forEach((c, i) => {
   root.appendChild(d);
 });
 
+document.addEventListener('keydown', e => {
+  const n = parseInt(e.key);
+  if (n >= 1 && n <= 4 && !e.repeat) {
+    btns[n - 1].click();
+  }
+});
+
 function flash(i) {
   btns[i].style.opacity = 1;
   btns[i].style.transform = 'scale(1.05)';

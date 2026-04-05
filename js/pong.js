@@ -28,9 +28,22 @@ document.addEventListener('touchmove', e => {
 
 c.addEventListener('mousemove', e => { py = e.clientY; });
 
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (['ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
 function f() {
   if (!go) return;
   requestAnimationFrame(f);
+
+  if (keys['ArrowUp'] || keys['w']) py -= 10;
+  if (keys['ArrowDown'] || keys['s']) py += 10;
+  py = Math.max(ph / 2, Math.min(H - ph / 2, py));
 
   x.fillStyle = '#000';
   x.fillRect(0, 0, W, H);
