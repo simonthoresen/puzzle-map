@@ -93,8 +93,12 @@ function f() {
 
   const s = (Date.now() - t0) / 1e3 | 0;
   x.fillStyle = '#fff';
-  x.font = '14px monospace';
-  x.fillText(s + 's/20s', 8, 20);
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText(s + 's / 20s', 10, 20);
+  x.shadowBlur = 0;
 
   if (s >= 20) {
     go = 0;

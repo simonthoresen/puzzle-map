@@ -87,5 +87,13 @@ document.addEventListener('keyup', e => { keys[e.key] = false; });
       (bl[j].x - e.x) ** 2 < 144 & bl[j].y < e.y + 16 & bl[j].y > e.y && (en.splice(i, 1), bl.splice(j, 1), sc++);
   }
 
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Kills: ' + sc + '/15   HP: ' + hp, 10, 20);
+  x.shadowBlur = 0;
+
   sc > 14 && (go = 0, root.style.cssText = Z + '#0f0;padding:1em', root.textContent = L);
 }()

@@ -82,6 +82,15 @@ const bossY = 40;
   x.fillStyle = '#f00';
   x.fillRect(bx - bossW / 2, bossY - 10, bossW * (bossHp / 30), 6);
 
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'center';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('BOSS: ' + bossHp + '/30', bx, bossY - 16);
+  x.textAlign = 'left';
+  x.shadowBlur = 0;
+
   x.fillStyle = '#0af';
   x.beginPath();
   x.moveTo(px, py - 14);
@@ -91,8 +100,15 @@ const bossY = 40;
 
   x.fillStyle = '#0f0';
   for (let i = 0; i < playerHp; i++) {
-    x.fillRect(10 + i * 20, H - 20, 14, 10);
+    x.fillRect(10 + i * 20, H - 24, 14, 10);
   }
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('HP: ' + playerHp, 10, H - 30);
+  x.shadowBlur = 0;
 
   for (let i = shots.length; i--;) {
     let p = shots[i];

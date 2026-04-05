@@ -78,5 +78,14 @@ document.addEventListener('keyup', e => { keys[e.key] = false; });
   x.fillStyle = '#fff';
   x.fillRect(bx - 3, by - 3, 6, 6);
 
+  var total = bk.length;
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Bricks: ' + l + '/' + total, 10, 24);
+  x.shadowBlur = 0;
+
   l || (root.style.cssText = Z + '#0f0;padding:1em', root.textContent = L);
 }()

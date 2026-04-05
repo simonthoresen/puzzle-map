@@ -80,4 +80,12 @@ setInterval(() => {
 
   x.fillStyle = 'red';
   x.fillRect(fd.x * G, fd.y * G, G - 1, G - 1);
+
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Food: ' + sc + '/12', 10, 20);
+  x.shadowBlur = 0;
 }, 120)

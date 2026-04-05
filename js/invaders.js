@@ -99,6 +99,14 @@ document.addEventListener('keyup', e => { keys[e.key] = false; });
       bl[i].x > e.x && bl[i].x < e.x + 24 && bl[i].y > e.y && bl[i].y < e.y + 18 && (e.a = 0, bl.splice(i, 1));
   }
 
+  x.fillStyle = '#fff';
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Aliens: ' + lf + '/24', 10, 20);
+  x.shadowBlur = 0;
+
   if (!lf) {
     go = 0;
     E('#0f0;padding:1em');

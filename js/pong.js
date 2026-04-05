@@ -90,7 +90,10 @@ function f() {
 
   x.font = 'bold 24px monospace';
   x.textAlign = 'center';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
   x.fillText(ps + ' : ' + as, W / 2, 36);
+  x.shadowBlur = 0;
 
   if (ps >= 7) {
     go = 0;

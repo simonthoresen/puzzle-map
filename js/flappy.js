@@ -83,8 +83,12 @@ function f() {
   if (by < 0 || by > H) return die();
 
   x.fillStyle = '#fff';
-  x.font = '16px monospace';
-  x.fillText(sc + '/12', 8, 24);
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Pipes: ' + sc + '/12', 10, 20);
+  x.shadowBlur = 0;
 
   if (sc >= 12) {
     go = 0;

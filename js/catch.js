@@ -81,8 +81,12 @@ function f() {
   }
 
   x.fillStyle = '#fff';
-  x.font = '16px monospace';
-  x.fillText(sc + '/20  lives:' + (1 - miss), 8, 24);
+  x.font = 'bold 14px monospace';
+  x.textAlign = 'left';
+  x.shadowColor = '#000';
+  x.shadowBlur = 4;
+  x.fillText('Caught: ' + sc + '/20   Lives: ' + (1 - miss), 10, 20);
+  x.shadowBlur = 0;
 
   if (sc >= 20) {
     go = 0;

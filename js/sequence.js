@@ -6,6 +6,11 @@ let c = 1;
 const sz = Math.min(innerWidth, innerHeight) / 3.5;
 const tiles = [];
 
+const hd = document.createElement('div');
+hd.style.cssText = 'position:fixed;top:8px;left:0;width:100%;text-align:center;color:#fff;font:bold 1rem monospace;z-index:1';
+hd.textContent = 'Next: 1';
+root.appendChild(hd);
+
 for (let i = 0; i < 9; i++) {
   const d = document.createElement('div');
   d.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;display:flex;align-items:center;justify-content:center;background:#333;color:#fff;font:bold min(8vw,2.5rem) monospace;border-radius:8px';
@@ -35,6 +40,7 @@ root.onclick = e => {
     d.style.background = '#0a0';
     d.style.color = '#000';
     c++;
+    hd.textContent = 'Next: ' + c;
 
     if (c > 9)
       setTimeout(() => {

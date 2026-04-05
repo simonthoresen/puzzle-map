@@ -12,6 +12,11 @@ let busy = 0;
 
 const s = Math.min(innerWidth / 4.5, innerHeight / 4.5);
 
+const hd = document.createElement('div');
+hd.style.cssText = 'position:fixed;top:8px;left:0;width:100%;text-align:center;color:#fff;font:bold 1rem monospace;z-index:1';
+hd.textContent = 'Pairs: 0/8';
+root.appendChild(hd);
+
 cards.forEach((v, i) => {
   const d = document.createElement('div');
   d.style.cssText = 'width:' + s + 'px;height:' + s + 'px;display:flex;align-items:center;justify-content:center;background:#444;color:#444;font:bold ' + (s * .4) + 'px monospace;border-radius:6px';
@@ -33,6 +38,7 @@ cards.forEach((v, i) => {
         f1.dataset.done = f2.dataset.done = 1;
         f1.style.background = f2.style.background = '#060';
         mt++;
+        hd.textContent = 'Pairs: ' + mt + '/8';
         f1 = f2 = null;
         busy = 0;
 

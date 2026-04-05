@@ -21,7 +21,7 @@ for (let i = 0; i < 9; i++) {
       d.style.background = '#4a3a28';
       setTimeout(() => d.style.background = '#3a2a18', 150);
       sc++;
-      hd.textContent = sc + '/15  miss:' + ms + '/3';
+      hd.textContent = 'Caught: ' + sc + '/15   Misses: ' + ms + '/3';
 
       if (sc >= 15) {
         root.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#0f0;font:bold min(6vw,2rem) monospace;text-align:center;padding:1em';
@@ -31,7 +31,7 @@ for (let i = 0; i < 9; i++) {
       ms++;
       d.style.background = '#600';
       setTimeout(() => d.style.background = '#3a2a18', 200);
-      hd.textContent = sc + '/15  miss:' + ms + '/3';
+      hd.textContent = 'Caught: ' + sc + '/15   Misses: ' + ms + '/3';
 
       if (ms >= 3) {
         root.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f44;font:bold 5vw monospace';
@@ -46,7 +46,7 @@ for (let i = 0; i < 9; i++) {
 
 const hd = document.createElement('div');
 hd.style.cssText = 'position:fixed;top:8px;left:0;width:100%;text-align:center;color:#fff;font:bold 1rem monospace';
-hd.textContent = '0/15  miss:0/3';
+hd.textContent = 'Caught: 0/15   Misses: 0/3';
 root.appendChild(hd);
 
 setInterval(() => {
