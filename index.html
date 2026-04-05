@@ -43,7 +43,7 @@
       // "n" = template name, "l" = location, rest = __KEY__ placeholders
       try {
         var cfg = JSON.parse(b64decode(t));
-        var name = cfg.n.replace(/[^a-z0-9\-]/gi, '');
+        var name = (cfg._ || cfg.n || '').replace(/[^a-z0-9\-]/gi, '');
         fetch('js/' + name + '.js')
           .then(function(r) {
             if (!r.ok) throw new Error('Template not found: ' + name);
@@ -51,7 +51,7 @@
           })
           .then(function(js) {
             for (var k in cfg) {
-              if (k === 'n') continue;
+              if (k === '_' || k === 'n') continue;
               js = js.replaceAll('__' + k.toUpperCase() + '__', String(cfg[k]));
             }
             run(js);
